@@ -35,5 +35,7 @@ return {
                 },
             }
         }
+        vim.keymap.set("n", "<C-m>", ":BufferLineCycleNext<CR>", { noremap = true, silent = true })
+        vim.keymap.set("n", "<C-A-m>", ":BufferLineCyclePrev<CR>", { noremap = true, silent = true })
     end
 }
