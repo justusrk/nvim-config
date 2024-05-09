@@ -30,7 +30,7 @@ return {
         vim.keymap.set('n', '<leader>fls', function()
             builtin.live_grep() -- live grep (might be less performant - does entire regex search on each term)
         end)
-        vim.keymap.set('n', '<leader>vh', builtin.help_tags, {})
+        vim.keymap.set('n', '<leader>hv', builtin.help_tags, {})
         -- ToDo maybe use fzf native algo - https://github.com/nvim-telescope/telescope-fzf-native.nvim
         require('telescope').load_extension('smart_history')
     end

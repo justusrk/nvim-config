@@ -1,3 +1,4 @@
+-- To autodetect the indent of a file
 return {
     "nmac427/guess-indent.nvim",
     config = function()

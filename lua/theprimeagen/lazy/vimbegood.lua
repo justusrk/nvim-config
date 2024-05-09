@@ -1,3 +1,4 @@
+-- A simple vim exercise plugin made by theprimeagen
 return {
     "theprimeagen/vim-be-good",
 

@@ -1,3 +1,4 @@
+-- For generating annotations and comments for documentation
 return {
     "danymat/neogen",
     dependencies = {
@@ -11,11 +12,11 @@ return {
             snippet_engine = "luasnip"
         })
 
-        vim.keymap.set("n", "<leader>nf", function()
+        vim.keymap.set("n", "<leader>cnf", function()
             neogen.generate({ type = "func" })
         end)
 
-        vim.keymap.set("n", "<leader>nt", function()
+        vim.keymap.set("n", "<leader>cnt", function()
             neogen.generate({ type = "type" })
         end)
 

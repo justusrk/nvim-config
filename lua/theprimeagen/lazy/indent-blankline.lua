@@ -1,3 +1,4 @@
+-- For highlighting indents and whitespace
 local highlight = {
     "CursorColumn",
     "Whitespace",

@@ -1,5 +1,6 @@
+-- Theming and Looks
 function ColorMyPencils(color)
-	color = color or "rose-pine"
+	color = color or "catppuccin"
 	vim.cmd.colorscheme(color)
 
 	vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
@@ -48,7 +49,10 @@ return {
         priority = 1000,
         event = "VimEnter",
         config = function()
+            require("catppuccin").setup({
+            })
             vim.cmd.colorscheme "catppuccin"
+            -- ColorMyPencils()
         end,
     }
 

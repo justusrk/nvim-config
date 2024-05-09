@@ -1,3 +1,6 @@
+-- Tresitter effeciently parses code and provides a tree of the code. 
+-- This is useful for many things like syntax highlighting, code folding, and more.
+-- This is used by many plugins
 return {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",

@@ -1,3 +1,4 @@
+-- Trouble is for listing errors and warnings something like quickfix but with more features
 return {
     {
         "folke/trouble.nvim",

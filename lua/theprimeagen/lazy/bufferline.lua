@@ -1,7 +1,10 @@
 return {
     'akinsho/bufferline.nvim',
     version = "*",
-    dependencies = 'nvim-tree/nvim-web-devicons',
+    dependencies = {
+        'nvim-tree/nvim-web-devicons',
+        'famiu/bufdelete.nvim'
+    },
     config = function ()
         require('bufferline').setup {
             options = {
@@ -27,12 +30,26 @@ return {
                         text = "File Explorer",
                         text_align = "center",
                         
+                    },
+                    {
+                        filetype = "undotree",
+                        text = "Undo Tree",
+                        text_align = "center",
+                        
                     }
                 },
-                ignore_filetype = {
-                    "NvimTree",
-                    "help"
-                },
+                custom_filter = function(buf_number, buf_numbers)
+                    -- filter out filetypes you don't want to see
+                    -- print(vim.bo[buf_number].filetype)
+                    if vim.bo[buf_number].filetype == "qf" then
+                        return false
+                    end
+                    if vim.bo[buf_number].filetype == "NvimTree" then
+                        return false
+                    end
+                    return true
+                end,
+                -- close_command = require('bufdelete').bufdelete, -- don't know if this works
             }
         }
         vim.keymap.set("n", "<C-m>", ":BufferLineCycleNext<CR>", { noremap = true, silent = true })

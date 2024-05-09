@@ -1,3 +1,4 @@
+-- For quick accessing files
 return {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
@@ -9,7 +10,7 @@ return {
 
         vim.keymap.set("n", "<C-h>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end) -- show harpoon menu
         vim.keymap.set("n", "<leader>ha", function() harpoon:list():add() end) -- add current file to harpoon
-        vim.keymap.set("n", "<leader>hj", function() harpoon:list():replace_at(1) end)
+        vim.keymap.set("n", "<leader>hh", function() harpoon:list():replace_at(1) end)
         vim.keymap.set("n", "<leader>hj", function() harpoon:list():replace_at(2) end)
         vim.keymap.set("n", "<leader>hk", function() harpoon:list():replace_at(3) end)
         vim.keymap.set("n", "<leader>hl", function() harpoon:list():replace_at(4) end)

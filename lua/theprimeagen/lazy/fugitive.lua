@@ -1,3 +1,4 @@
+-- Vim Convenience using Fugitive
 return {
     "tpope/vim-fugitive",
     config = function()

@@ -1,4 +1,4 @@
-
+-- Undo history tree -- now you can time travel your code changes
 return {
     "mbbill/undotree",
 

@@ -41,12 +41,14 @@ autocmd('TextYankPost', {
     end,
 })
 
+-- Remove Trailing Space from each line in the buffer before saving
 autocmd({"BufWritePre"}, {
     group = ThePrimeagenGroup,
     pattern = "*",
     command = [[%s/\s\+$//e]],
 })
 
+-- Upon LspAttach set some keymaps only for files supported by LSP
 autocmd('LspAttach', {
     group = ThePrimeagenGroup,
     callback = function(e)
@@ -57,14 +59,11 @@ autocmd('LspAttach', {
         vim.keymap.set("n", "<leader>cws", function() vim.lsp.buf.workspace_symbol() end, opts) -- search for symbols in the workspace
         vim.keymap.set("n", "<leader>cd", function() vim.diagnostic.open_float() end, opts) -- open the diagnostic message floating window
         vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts) -- code action to do things like import missing modules etc..
-        vim.keymap.set("n", "<leader>crr", function() vim.lsp.buf.references() end, opts) -- list references
-        vim.keymap.set("n", "<leader>crn", function() vim.lsp.buf.rename() end, opts) -- rename symbol
-        vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next() end, opts)
-        vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev() end, opts)
+        vim.keymap.set("n", "<leader>crr", function() vim.lsp.buf.references() end, opts) -- code list references
+        vim.keymap.set("n", "<leader>crn", function() vim.lsp.buf.rename() end, opts) -- code rename symbol
+        vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next() end, opts) -- next diagnostic message
+        vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev() end, opts) -- previous diagnostic message
     end
 })
 
 
-vim.g.netrw_browse_split = 0
-vim.g.netrw_banner = 0
-vim.g.netrw_winsize = 25
