@@ -20,8 +20,11 @@ vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
 
-vim.opt.colorcolumn = "80"
+vim.opt.colorcolumn = "120"
 
--- Disable Default netrw
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+-- netrw : Vim's Default File Explorer
+vim.g.loaded_netrw = 1 -- tell neovim we already have netrw and thus don't load the default netrw
+vim.g.loaded_netrwPlugin = 1 -- same as above
+vim.g.netrw_browse_split = 0 -- open netrw in the current window
+vim.g.netrw_banner = 0 -- disable netrw banner
+vim.g.netrw_winsize = 25 -- set the window size to 25
