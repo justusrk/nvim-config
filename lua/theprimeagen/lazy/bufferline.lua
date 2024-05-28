@@ -52,7 +52,12 @@ return {
                 -- close_command = require('bufdelete').bufdelete, -- don't know if this works
             }
         }
-        vim.keymap.set("n", "<C-.>", ":BufferLineCycleNext<CR>", { noremap = true, silent = true })
+        -- Beware the following keybindings require terminal to understand C-, C-. keypress
+        -- Works in iTerm2
+        vim.keymap.set("n", "<C-.>", ":BufferLineCycleNext<CR>", { noremap = true, silent = true }) 
         vim.keymap.set("n", "<C-,>", ":BufferLineCyclePrev<CR>", { noremap = true, silent = true })
+        -- We could also use C-] and C-[ but we don't want to override the default behavior
+        -- default C-] (jump to definition for tags in vim) 
+        -- default C-[ simulates the Esc character
     end
 }

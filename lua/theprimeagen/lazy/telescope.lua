@@ -17,24 +17,64 @@ return {
             local cursor_pos = vim.fn.getcurpos()[3] -- Use the logical column number
             local new_line = '> ' .. string.sub(current_line, cursor_pos)
             vim.api.nvim_buf_set_lines(prompt_bufnr, 2, -1, false, {new_line})
--- asd as asd asd f1 asd 
         end
-
+        local function delete_character_to_right_of_cursor(prompt_bufnr)
+            local current_line = vim.api.nvim_get_current_line()
+            local cursor_pos = vim.api.nvim_win_get_cursor(0) -- cursor_pos = (row, col)
+            if cursor_pos[2] < #current_line then -- if col < length of current_line
+                local new_line = current_line:sub(1, cursor_pos[2]) .. current_line:sub(cursor_pos[2] + 2)
+                vim.api.nvim_set_current_line(new_line)
+            end
+        end
+        local function move_cursor_x(prompt_bufnr, dx)
+            local current_line = vim.api.nvim_get_current_line()
+            local cursor_pos = vim.api.nvim_win_get_cursor(0)
+            local to_cursor_x = cursor_pos[2] + dx
+            if to_cursor_x > 0 and to_cursor_x <= #current_line then
+                cursor_pos[2] = to_cursor_x
+                vim.api.nvim_win_set_cursor(0, cursor_pos)
+            end
+            
+        end
+        local function move_cursor_to_right(prompt_bufnr)
+            move_cursor_x(prompt_bufnr, 1)
+        end
+        local function move_cursor_to_left(prompt_bufnr) 
+            move_cursor_x(prompt_bufnr, -1)
+        end
+        local function move_cursor_to_beginning(prompt_bufnr) 
+            local cursor_pos = vim.api.nvim_win_get_cursor(0)
+            vim.api.nvim_win_set_cursor(0, {cursor_pos[1], 2})
+        end
+        local function move_cursor_to_end(prompt_bufnr) 
+            local cursor_pos = vim.api.nvim_win_get_cursor(0)
+            local current_line = vim.api.nvim_get_current_line()
+            vim.api.nvim_win_set_cursor(0, {cursor_pos[1], #current_line})
+        end
         local telescope = require('telescope').setup({
             defaults = {
                 mappings = {
                     i = {
-                        ["<C-j>"] = actions.select_default + actions.center,
+                        ["<CR>"] = actions.select_default + actions.center,
+                        ["<C-j>"] = actions.move_selection_next,
+                        ["<C-k>"] = actions.move_selection_previous,
+
+                        ["<C-l>"] = delete_character_to_right_of_cursor,
+                        -- some terminal like mappings
+                        ["<C-f>"] = move_cursor_to_right,
+                        ["<C-b>"] = move_cursor_to_left, 
+                        ["<C-a>"] = move_cursor_to_beginning,
+                        ["<C-e>"] = move_cursor_to_end, 
+
+                        -- Beware the following keybindings require terminal to understand C-, C-. keypress
+                        -- Works in iTerm2
                         ["<C-,>"] = actions.cycle_history_prev,
                         ["<C-.>"] = actions.cycle_history_next,
-                        -- some terminal like mappings
-                        ["<C-u>"] = delete_from_start_to_cursor,
-                        ["<C-w>"] = function()
-                            vim.cmd [[normal! cb]]
-                        end,
                     },
                     n = {
-                        ["<C-j>"] = actions.select_default + actions.center,
+                        ["<CR>"] = actions.select_default + actions.center,
+                        ["<C-j>"] = actions.move_selection_next,
+                        ["<C-k>"] = actions.move_selection_previous,
                         ["<C-,>"] = actions.cycle_history_prev,
                         ["<C-.>"] = actions.cycle_history_next
                         
