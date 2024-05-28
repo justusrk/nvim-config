@@ -52,7 +52,7 @@ return {
                 -- close_command = require('bufdelete').bufdelete, -- don't know if this works
             }
         }
-        vim.keymap.set("n", "<C-m>", ":BufferLineCycleNext<CR>", { noremap = true, silent = true })
-        vim.keymap.set("n", "<C-A-m>", ":BufferLineCyclePrev<CR>", { noremap = true, silent = true })
+        vim.keymap.set("n", "<C-.>", ":BufferLineCycleNext<CR>", { noremap = true, silent = true })
+        vim.keymap.set("n", "<C-,>", ":BufferLineCyclePrev<CR>", { noremap = true, silent = true })
     end
 }

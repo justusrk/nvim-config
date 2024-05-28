@@ -9,7 +9,40 @@ return {
     },
 
     config = function()
-        local telescope = require('telescope').setup({})
+        local actions = require('telescope.actions')
+        local action_state = require('telescope.actions.state')
+
+        local function delete_from_start_to_cursor(prompt_bufnr)
+            local current_line = action_state.get_current_line()
+            local cursor_pos = vim.fn.getcurpos()[3] -- Use the logical column number
+            local new_line = '> ' .. string.sub(current_line, cursor_pos)
+            vim.api.nvim_buf_set_lines(prompt_bufnr, 2, -1, false, {new_line})
+-- asd as asd asd f1 asd 
+        end
+
+        local telescope = require('telescope').setup({
+            defaults = {
+                mappings = {
+                    i = {
+                        ["<C-j>"] = actions.select_default + actions.center,
+                        ["<C-,>"] = actions.cycle_history_prev,
+                        ["<C-.>"] = actions.cycle_history_next,
+                        -- some terminal like mappings
+                        ["<C-u>"] = delete_from_start_to_cursor,
+                        ["<C-w>"] = function()
+                            vim.cmd [[normal! cb]]
+                        end,
+                    },
+                    n = {
+                        ["<C-j>"] = actions.select_default + actions.center,
+                        ["<C-,>"] = actions.cycle_history_prev,
+                        ["<C-.>"] = actions.cycle_history_next
+                        
+                    }
+                }
+            }
+        })
+        
 
         local builtin = require('telescope.builtin')
         vim.keymap.set('n', '<leader>fo', builtin.resume, {}) -- find opened results

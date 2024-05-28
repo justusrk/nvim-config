@@ -12,6 +12,8 @@ return {
         "L3MON4D3/LuaSnip",
         "saadparwaiz1/cmp_luasnip",
         "j-hui/fidget.nvim",
+        "danymat/neogen",
+        
     },
 
     config = function()
@@ -58,7 +60,8 @@ return {
         })
 
         local cmp_select = { behavior = cmp.SelectBehavior.Select }
-
+        local neogen = require('neogen')
+        local luasnip = require("luasnip")
         cmp.setup({
             snippet = {
                 expand = function(args)
@@ -70,6 +73,20 @@ return {
                 ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
                 ['<C-y>'] = cmp.mapping.confirm({ select = true }),
                 ['<C-Space>'] = cmp.mapping.complete(), -- code complete
+                ["<C-l>"] = cmp.mapping(function(fallback)
+                    if luasnip and luasnip.expand_or_jumpable() then
+                        luasnip.expand_or_jump()
+                    else
+                        fallback()
+                    end
+                end, { "i", "s" }),
+                ["<C-o>"] = cmp.mapping(function(fallback)
+                    if luasnip and luasnip.jumpable(-1) then
+                        luasnip.jump(-1)
+                    else
+                        fallback()
+                    end
+                end, { "i", "s" }),
             }),
             sources = cmp.config.sources({
                 { name = 'nvim_lsp' },

@@ -124,11 +124,11 @@ vim.keymap.set("n", "<leader>k", "<cmd>lprev<CR>zz") -- location list previous (
 -- vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
 vim.keymap.set("n", "<leader>cf", vim.lsp.buf.format) -- format code
 
--- Command Mode Remaps
+-- Command Line Mode Remaps
 -- <C-w> to delete the word before the cursor
 -- <C-u> to delete the line from beginning upto the cursor
 -- <C-f> open command-line window with the command-line history
--- <C-c> in command-line window to choose the command from the history
+--      <C-c> in command-line window to choose the command from the history
 -- <C-c> in command line to cancel the command-line mode
 -- <C-r>[r] in command-line mode insert the contents of a register 
 --      [r] [r = + , r = *] for system clipboard, [r = "] for the default register
