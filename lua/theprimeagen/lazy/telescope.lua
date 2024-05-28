@@ -56,6 +56,7 @@ return {
                 mappings = {
                     i = {
                         ["<CR>"] = actions.select_default + actions.center,
+                        ["<C-m>"] = actions.select_default + actions.center,
                         ["<C-j>"] = actions.move_selection_next,
                         ["<C-k>"] = actions.move_selection_previous,
 
@@ -73,6 +74,7 @@ return {
                     },
                     n = {
                         ["<CR>"] = actions.select_default + actions.center,
+                        ["<C-m>"] = actions.select_default + actions.center,
                         ["<C-j>"] = actions.move_selection_next,
                         ["<C-k>"] = actions.move_selection_previous,
                         ["<C-,>"] = actions.cycle_history_prev,
