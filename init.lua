@@ -8,6 +8,5 @@ else
     -- Standalone Neovim specific settings
     -- print("Running standalone Neovim")
     require('theprimeagen')
-    -- require('justusrk-vscode')
     -- Load standalone specific plugins or settings
 end
