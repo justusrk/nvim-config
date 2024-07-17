@@ -50,6 +50,7 @@ return {
         event = "VimEnter",
         config = function()
             require("catppuccin").setup({
+                term_colors = true,
             })
             vim.cmd.colorscheme "catppuccin"
             -- ColorMyPencils()

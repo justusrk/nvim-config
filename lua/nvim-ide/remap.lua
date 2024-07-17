@@ -27,8 +27,8 @@ vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("x", "<leader>p", [["_dP]])
 
 -- Yank/Copy to system clipboard
-vim.keymap.set({"n", "v"}, "<leader>y", [["+y]])
-vim.keymap.set("n", "<leader>Y", [["+Y]])
+vim.keymap.set({"n", "v"}, "<leader>y", [["+y]]) -- yank to system clipboard
+vim.keymap.set("n", "<leader>Y", [["+Y]]) -- yank entire line to system clipboard
 
 -- Delete to the blackhole register
 vim.keymap.set({"n", "v"}, "<leader>d", [["_d]])
@@ -52,6 +52,27 @@ vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", {
     silent = true
 })
+
+-- Saving Files
+vim.keymap.set('n', '<D-s>', ':wa<CR>') -- Save all files
+vim.keymap.set('i', '<D-s>', '<Esc>:wa<CR>') -- Save all files
+vim.keymap.set("v", "<D-s>", "<Esc>:wa<CR>gv") -- Save all files
+vim.keymap.set("n", "<M-s>", ":w<CR>") -- save current file
+vim.keymap.set("i", "<M-s>", "<Esc>:w<CR>a") -- save current file
+vim.keymap.set("v", "<M-s>", "<Esc>:w<CR>gv") -- save current file
+
+-- Copy
+vim.keymap.set('v', '<D-c>', '"+y') -- Copy
+
+-- Paste
+-- vim.keymap.set('', '<D-v>', '"+P', { noremap = true, silent = true}) -- Paste in normal (n), visual (v), select (x), and operator-pending (o) modes.
+vim.keymap.set('n', '<D-v>', '"+p', { noremap = true, silent = true})
+vim.keymap.set('v', '<D-v>', '"+p', { noremap = true, silent = true})
+-- vim.keymap.set('!', '<D-v>', '<C-R>+', { noremap = true, silent = true}) -- Paste in insert and command line modes
+vim.keymap.set('c', '<D-v>', '<C-R>+', { noremap = true, silent = true }) -- Paste in command mode
+vim.keymap.set('i', '<D-v>', '<C-R>+', { noremap = true, silent = true }) -- Paste in insert mode
+vim.keymap.set('t', '<D-v>', '<C-R>+', { noremap = true, silent = true}) -- Paste in terminal mode
+
 
 -- vim.keymap.set("n", "<leader><leader>", function()
 --     vim.cmd("so") -- source file - maybe we need to specify the file to source
@@ -149,6 +170,14 @@ vim.api.nvim_set_keymap('c', '<C-l>', '<Del>', {noremap = true}) -- delete : del
 vim.api.nvim_set_keymap('c', '<C-b>', '<S-Left>', {noremap = true}) -- move to the beginning of the previous word
 vim.api.nvim_set_keymap('c', '<C-e>', '<S-Right>', {noremap = true}) -- move to the end of the next word
 
+-- Terminal Keymaps
+vim.api.nvim_set_keymap('t', '<C-[>', '<C-\\><C-n>', {noremap = true, silent = true}) -- enter normal mode
+vim.api.nvim_set_keymap('t', '<C-w>j', [[<Cmd>wincmd j<CR>]], {noremap = true , silent = true}) -- move to window below
+vim.api.nvim_set_keymap('t', '<C-w>k', [[<Cmd>wincmd k<CR>]], {noremap = true, silent = true}) -- move to window above
+vim.api.nvim_set_keymap('t', '<C-w>h', [[<Cmd>wincmd h<CR>]], {noremap = true , silent = true}) -- move to window left
+vim.api.nvim_set_keymap('t', '<C-w>l', [[<Cmd>wincmd l<CR>]], {noremap = true , silent = true}) -- move to window right
+
+
 -- Copilot Keymaps
 vim.keymap.set('i', '<C-\\>', '<Plug>(copilot-dismiss)')
 vim.keymap.set('i', '<M-\\>', '<Plug>(copilot-suggest)')
@@ -160,3 +189,34 @@ vim.keymap.set('i', '<M-=>', '<Plug>(copilot-accept-line)')
 
 -- Make it Rain Cellular Automaton Relax --
 vim.keymap.set("n", "<leader>zmr", "<cmd>CellularAutomaton make_it_rain<CR>");
+
+
+-- Autocmd Keymaps
+local shared = require('common.shared')
+local autocmd = vim.api.nvim_create_autocmd
+
+-- Upon LspAttach set some keymaps only for files supported by LSP
+autocmd('LspAttach', {
+    group = shared.group_justusrk,
+    callback = function(e)
+        local opts = { buffer = e.buf }
+        vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts) -- use the default vim gd (goto definition)
+        vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts) -- use the default K (show information in hover)
+        vim.keymap.set("i", "<C-k>", function() vim.lsp.buf.signature_help() end, opts) -- open signature help floating window
+        vim.keymap.set("n", "<leader>cws", function() vim.lsp.buf.workspace_symbol() end, opts) -- search for symbols in the workspace
+        vim.keymap.set("n", "<leader>cd", function() vim.diagnostic.open_float() end, opts) -- open the diagnostic message floating window
+        vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts) -- code action to do things like import missing modules etc..
+        vim.keymap.set("n", "<leader>crr", function() vim.lsp.buf.references() end, opts) -- code list references
+        vim.keymap.set("n", "<leader>crn", function() vim.lsp.buf.rename() end, opts) -- code rename symbol
+        vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next() end, opts) -- next diagnostic message
+        vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev() end, opts) -- previous diagnostic message
+    end
+})
+
+vim.api.nvim_create_autocmd("TermOpen", {
+    pattern = "*",
+    callback = function(e)
+        local opts = { buffer = e.buf }
+    end
+  })
+

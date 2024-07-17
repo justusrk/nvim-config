@@ -18,6 +18,9 @@ return {
         vim.keymap.set("n", "<leader>hf", function() harpoon:list():replace_at(6) end)
         vim.keymap.set("n", "<leader>hd", function() harpoon:list():replace_at(7) end)
         vim.keymap.set("n", "<leader>hs", function() harpoon:list():replace_at(8) end)
+        -- Cycle through harpoon buffers
+        -- vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
+        -- vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end)
         
         harpoon:extend({
             UI_CREATE = function(cx)

@@ -53,7 +53,7 @@ return {
             }
         }
         -- Beware the following keybindings require terminal to understand C-, C-. keypress
-        -- Works in iTerm2
+        -- Works in iTerm2 and Neovide
         vim.keymap.set("n", "<C-.>", ":BufferLineCycleNext<CR>", { noremap = true, silent = true }) 
         vim.keymap.set("n", "<C-,>", ":BufferLineCyclePrev<CR>", { noremap = true, silent = true })
         -- We could also use C-] and C-[ but we don't want to override the default behavior

@@ -10,6 +10,38 @@ local function my_on_attach(bufnr)
             nowait = true
         }
     end
+    
+    -- Define the function to move to the right window and open
+    local function move_previous_and_harpoon()
+        -- Get the current window number and layout
+        local current_win = vim.api.nvim_get_current_win()
+        local win_info = vim.fn.winlayout()
+    
+        local is_single_window = false
+        -- check if only one window is open
+        if win_info[1] == 'leaf' then
+            is_single_window = true
+        end
+        
+
+        local function is_terminal_window()
+            local bufnr = vim.api.nvim_win_get_buf(0)  -- Get the buffer number of the current window
+            local buftype = vim.api.nvim_buf_get_option(bufnr, 'buftype')  -- Get the value of 'buftype' for the buffer
+            return buftype == 'terminal'
+        end
+    
+        -- Move to the previous window 
+        if not is_single_window then
+            vim.cmd('wincmd p')
+            if is_terminal_window() then
+                vim.cmd('wincmd w')
+            end
+            
+        end
+
+        local harpoon = require("harpoon");
+        harpoon.ui:toggle_quick_menu(harpoon:list())
+    end
 
     -- default mappings
     -- api.config.mappings.default_on_attach(bufnr)
@@ -76,14 +108,18 @@ local function my_on_attach(bufnr)
     vim.keymap.set('n', '<2-LeftMouse>', api.node.open.edit, opts('Open'))
     vim.keymap.set('n', '<2-RightMouse>', api.tree.change_root_to_node, opts('CD'))
 
-    vim.keymap.set('n', '<C-h>', '<C-w>l', opts('Move to Right Window')) -- for harpoon: switch out to file buffer before harpoon so harpoon does open the buffer in the tree window
+    vim.keymap.set('n', '<C-h>', move_previous_and_harpoon, { noremap = true, silent = true })
+    -- vim.keymap.set('n', '<C-h>', '<C-w>l', opts('Move to Right Window')) -- for harpoon: switch out to file buffer before harpoon so harpoon does open the buffer in the tree window
 end
 
 return {
     "nvim-tree/nvim-tree.lua",
     version = "*",
     lazy = false,
-    dependencies = {"nvim-tree/nvim-web-devicons"},
+    dependencies = {
+        "nvim-tree/nvim-web-devicons",
+        "ThePrimeagen/harpoon",
+    },
     config = function()
         require("nvim-tree").setup {
             sort = {
