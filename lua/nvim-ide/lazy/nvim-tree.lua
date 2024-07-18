@@ -108,8 +108,7 @@ local function my_on_attach(bufnr)
     vim.keymap.set('n', '<2-LeftMouse>', api.node.open.edit, opts('Open'))
     vim.keymap.set('n', '<2-RightMouse>', api.tree.change_root_to_node, opts('CD'))
 
-    vim.keymap.set('n', '<C-h>', move_previous_and_harpoon, { noremap = true, silent = true })
-    -- vim.keymap.set('n', '<C-h>', '<C-w>l', opts('Move to Right Window')) -- for harpoon: switch out to file buffer before harpoon so harpoon does open the buffer in the tree window
+    vim.keymap.set('n', '<C-h>', move_previous_and_harpoon, opts('Move to Right Window'))
 end
 
 return {
