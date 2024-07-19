@@ -49,7 +49,7 @@ vim.keymap.set("n", "<leader>fv", ":NvimTreeToggle<CR>") -- file view
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
 -- Make current file executable
-vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", {
+vim.keymap.set("n", "<leader>fx", "<cmd>!chmod +x %<CR>", {
     silent = true
 })
 
@@ -137,8 +137,8 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 vim.keymap.set("n", "<C-j>", "<cmd>cnext<CR>zz") -- quickfix next (global files)
 vim.keymap.set("n", "<C-k>", "<cmd>cprev<CR>zz") -- quickfix previous (global files)
-vim.keymap.set("n", "<leader>j", "<cmd>lnext<CR>zz") -- location list next (local to the current buffer)
-vim.keymap.set("n", "<leader>k", "<cmd>lprev<CR>zz") -- location list previous (local to the current buffer)
+vim.keymap.set("n", "<C-S-j>", "<cmd>lnext<CR>zz") -- location list next (local to the current buffer)
+vim.keymap.set("n", "<C-S-k>", "<cmd>lprev<CR>zz") -- location list previous (local to the current buffer)
 -- --- -- 
 
 -- vim.keymap.set("n", "Q", "<nop>") -- play last recorded macro
@@ -191,29 +191,223 @@ vim.keymap.set('i', '<M-=>', '<Plug>(copilot-accept-line)')
 vim.keymap.set("n", "<leader>zmr", "<cmd>CellularAutomaton make_it_rain<CR>");
 
 
+
 -- Autocmd Keymaps
 local shared = require('common.shared')
 local autocmd = vim.api.nvim_create_autocmd
 
+-- Quickfix and Locallist only keymaps
+-- TODO: handle location list 
+local function convert_to_trouble()
+    vim.g.justusrk_last_trouble_mode = "my_quickfix"
+    vim.cmd('cclose')
+    vim.cmd('Trouble my_quickfix open focus=true')
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+    group = shared.group_justusrk_quickfix_keymaps,
+    pattern = 'qf',
+    callback = function()
+      -- Set the keymap for quickfix buffers
+      -- To convert quickfix to trouble
+      vim.g.justusrk_last_trouble_mode = "my_quickfix"
+      vim.keymap.set('n', '<C-t>', convert_to_trouble, {buffer=0, noremap = true, silent = true, desc = "Convert Quickfix to Trouble" })
+    end
+})
+
+-- Trouble Keymaps
+
+local trouble_jump_when_modes = { -- for custom modes look in trouble's setup config
+    "my_diagnostics_local",
+    "my_diagnostics_global",
+    -- "my_quickfix",
+    -- "my_loclist",
+}
+
+local function trouble_jump_next()
+    local mode = vim.g.justusrk_last_trouble_mode or default_mode
+    vim.cmd('Trouble ' .. mode .. ' next')
+    if vim.tbl_contains(trouble_jump_when_modes, mode) then
+      vim.cmd('Trouble ' .. mode .. ' jump')
+    end
+end
+local function trouble_jump_previous()
+    local mode = vim.g.justusrk_last_trouble_mode or default_mode
+    vim.cmd('Trouble ' .. mode .. ' prev')
+    if vim.tbl_contains(trouble_jump_when_modes, mode) then
+      vim.cmd('Trouble ' .. mode .. ' jump')
+    end
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+    group = shared.group_justusrk_trouble_keymaps,
+    pattern = 'Trouble',
+    callback = function()
+      -- Set the keymap for trouble buffers
+      -- prevent convert quickfix jump in trouble -- gives an error bug in trouble : Cursor position outside buffer
+      vim.keymap.set('n', '<C-j>', trouble_jump_next, {buffer=0, noremap = true, silent = true, desc = "Trouble jump to next item" })
+      vim.keymap.set('n', '<C-k>', trouble_jump_previous, {buffer=0, noremap = true, silent = true, desc = "Trouble jump to previous item" })
+    end
+})
+
+
+local function load_trouble_keymaps() 
+    local default_mode = "diagnostics"
+    vim.g.justusrk_last_trouble_mode = default_mode;
+    -- jump only for certain modes on next and prev
+    
+    opts = { noremap = true, silent = true, desc = "Trouble Keymaps" }
+
+    opts.desc = "Trouble toggle list diagnostics for current file"
+    vim.keymap.set("n", "<leader>td", function() -- diag only current file
+        local mode = "my_diagnostics_local"
+        vim.g.justusrk_last_trouble_mode = mode
+        vim.cmd('Trouble ' .. mode .. ' toggle')
+    end, opts)
+    
+    opts.desc = "Trouble toggle list diagnostics for all open buffers"
+    vim.keymap.set("n", "<leader>tD", function() -- diag all open files
+        local mode = "my_diagnostics_global"
+        vim.g.justusrk_last_trouble_mode = mode
+        vim.cmd('Trouble ' .. mode .. ' toggle')
+    end, opts)
+
+    opts.desc = "Trouble toggle quickfix"
+    vim.keymap.set("n", "<leader>tq", function()
+        local mode = "my_quickfix"
+        vim.g.justusrk_last_trouble_mode = mode
+        vim.cmd('Trouble ' .. mode .. ' toggle')
+    end, opts)
+    
+    
+    opts.desc = "Trouble toggle locallist"
+    vim.keymap.set("n", "<leader>tl", function()
+        local mode = "my_loclist"
+        vim.g.justusrk_last_trouble_mode = mode
+        vim.cmd('Trouble ' .. mode .. ' toggle')
+    end, opts)
+    
+    opts.desc = "Trouble toggle last mode"
+    vim.keymap.set("n", "<leader>tt", function()
+        local mode = vim.g.justusrk_last_trouble_mode or default_mode
+        vim.cmd('Trouble ' .. mode .. ' toggle')
+    end, opts)
+    
+    opts.desc = "Trouble go to next item"
+    vim.keymap.set("n", "<D-j>", trouble_jump_next, opts)
+    
+    opts.desc = "Trouble go to previous item"
+    vim.keymap.set("n", "<D-k>", trouble_jump_previous, opts)
+end
+
+load_trouble_keymaps()
+
 -- Upon LspAttach set some keymaps only for files supported by LSP
+
+-- Function to list type definitions and handle multiple results
+local function fetch_lsp_list(req)
+    local params = vim.lsp.util.make_position_params()
+    vim.lsp.buf_request(0, req, params, 
+        function(err, result, ctx, _)
+          if err then
+            vim.notify('Error: ' .. err.message, vim.log.levels.ERROR)
+            return
+          end
+          if not result or vim.tbl_isempty(result) then
+            vim.notify('No type definitions found', vim.log.levels.INFO)
+            return
+          end
+          -- if #result == 1 then -- automatically jump there if only one location
+          --   vim.lsp.util.jump_to_location(result[1])
+          -- else
+          local locations = vim.lsp.util.locations_to_items(result, vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
+          vim.fn.setqflist(locations)
+          vim.api.nvim_command('copen')
+        end
+    )
+end
+
+
 autocmd('LspAttach', {
-    group = shared.group_justusrk,
+    group = shared.group_justusrk_lsp_config,
     callback = function(e)
-        local opts = { buffer = e.buf }
+        local opts = { buffer = e.buf, silent = true }
+
+        opts.desc = "Go to definition of symbol under cursor"
         vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts) -- use the default vim gd (goto definition)
+
+        opts.desc = "Go to declaration of symbol under cursor"
+        vim.keymap.set("n", "gD", function() vim.lsp.buf.declaration() end, opts) -- use the default vim gD (goto declaration)
+
+        opts.desc = "Display documentation for symbol under cursor"
         vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts) -- use the default K (show information in hover)
+        
+        opts.desc = "Displays signature information about the symbol under the cursor"
         vim.keymap.set("i", "<C-k>", function() vim.lsp.buf.signature_help() end, opts) -- open signature help floating window
+
+        opts.desc = "Search for symbols in the workspace"
         vim.keymap.set("n", "<leader>cws", function() vim.lsp.buf.workspace_symbol() end, opts) -- search for symbols in the workspace
+        
+        opts.desc = "Opens a floating window with diagnostic information"
         vim.keymap.set("n", "<leader>cd", function() vim.diagnostic.open_float() end, opts) -- open the diagnostic message floating window
-        vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts) -- code action to do things like import missing modules etc..
-        vim.keymap.set("n", "<leader>crr", function() vim.lsp.buf.references() end, opts) -- code list references
-        vim.keymap.set("n", "<leader>crn", function() vim.lsp.buf.rename() end, opts) -- code rename symbol
+        
+
+        opts.desc = "Code action rename symbol under cursor"
+        vim.keymap.set("n", "<leader>car", function() vim.lsp.buf.rename() end, opts) -- code action rename 
+
+        opts.desc = "Code format "
+        vim.keymap.set("n", "<leader>caf", function() vim.lsp.buf.format() end, opts) -- code action format 
+        
+        
+        opts.desc = "List available code actions at current cursor position"
+        vim.keymap.set({"n", "v"}, "<leader>cla", function() vim.lsp.buf.code_action() end, opts) -- code action to do things like import missing modules etc..
+
+        opts.desc = "List references of symbol under cursor"
+        vim.keymap.set("n", "<leader>clr", function() vim.lsp.buf.references() end, opts) -- code list references
+        
+        opts.desc = "List implementations of symbol under cursor"
+        vim.keymap.set("n", "<leader>cli", function() vim.lsp.buf.implementation() end, opts) -- code list implementations
+
+        opts.desc = "List definitions of symbol under cursor"        
+        vim.keymap.set("n", "<leader>cld", function() list_type_definitions('textDocument/definition') end, opts) -- list lsp definitions
+
+        opts.desc = "List declarations of symbol under cursor"        
+        vim.keymap.set("n", "<leader>clD", function() list_type_definitions('textDocument/declaration') end, opts) -- list declarations
+        
+        opts.desc = "List type definitions of symbol under cursor"
+        vim.keymap.set("n", "<leader>clt", function() list_type_definitions('textDocument/typeDefinition') end, opts) -- list lsp type definitions
+
+
+
+        opts.desc = "Go to next diagnostic message"
         vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next() end, opts) -- next diagnostic message
+
+        opts.desc = "Go to previous diagnostic message"
         vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev() end, opts) -- previous diagnostic message
+        
+        -- trouble keymaps
+        opts.desc = "List LSP definitions, references, implementations, type definitions, and declarations "
+        vim.keymap.set("n", "<leader>cll", 
+            function() 
+                local mode = "my_lsp"
+                vim.g.justusrk_last_trouble_mode = mode
+                vim.cmd('Trouble ' ..mode .. ' toggle  focus=false') 
+            end, 
+        opts) -- lsp List LSP definitions, references, implementations, type definitions, and declarations 
+        
+        opts.desc = "List document symbols"
+        vim.keymap.set("n", "<leader>cls", 
+            function() 
+                local mode = "my_symbols"
+                vim.g.justusrk_last_trouble_mode = mode
+                vim.cmd('Trouble ' ..mode .. ' toggle  focus=false') 
+            end,
+        opts) -- lsp symbols
     end
 })
 
 vim.api.nvim_create_autocmd("TermOpen", {
+    group = shared.group_justusrk,
     pattern = "*",
     callback = function(e)
         local opts = { buffer = e.buf }

@@ -11,7 +11,12 @@ local function my_on_attach(bufnr)
         }
     end
     
-    -- Define the function to move to the right window and open
+    -- Define the function to move to the rough previous window and open
+    -- open in the nvim-tree window iteself if there is no other window
+    -- open in the other window if only 2 windows (one is nvim-tree and other could be anything)
+    -- open in the previous window if openable else first reverse cycled openable window if there are more than 2 window
+    -- if there are no openable windows then it will open in the last unopenable window
+    -- for what is openable window see the function below
     local function move_previous_and_harpoon()
         -- Get the current window number and layout
         local current_win = vim.api.nvim_get_current_win()
@@ -24,23 +29,38 @@ local function my_on_attach(bufnr)
         end
         
 
-        local function is_terminal_window()
+        local get_current_win_buftype = function()
             local bufnr = vim.api.nvim_win_get_buf(0)  -- Get the buffer number of the current window
-            local buftype = vim.api.nvim_buf_get_option(bufnr, 'buftype')  -- Get the value of 'buftype' for the buffer
-            return buftype == 'terminal'
+            return vim.api.nvim_buf_get_option(bufnr, 'buftype')  -- Get the value of 'buftype' for the buffer
+        end
+
+        local get_current_win_filetype = function()
+            local bufnr = vim.api.nvim_win_get_buf(0)  -- Get the buffer number of the current window
+            return vim.api.nvim_buf_get_option(bufnr, 'filetype')  -- Get the value of 'filetype' for the buffer
+        end
+
+        local function is_openable_window() -- returns false for terminals and nvim-tree and quickfix
+            local buftype = get_current_win_buftype()
+            return not (buftype == 'terminal' or buftype == 'quickfix' or buftype == 'nofile')
         end
     
-        -- Move to the previous window 
+        -- Move to the previous valid window if there are multiple windows
         if not is_single_window then
             vim.cmd('wincmd p')
-            if is_terminal_window() then
-                vim.cmd('wincmd w')
+            local total_other_windows = vim.fn.winnr('$') - 1 -- subtract nvim-tree window
+            local count = 1
+            while count < total_other_windows and not is_openable_window() do
+                vim.cmd('wincmd W') -- go cycle previous window if it is non openable window
+                if get_current_win_filetype() == 'NvimTree' then -- check if it is nvim-tree window
+                    vim.cmd('wincmd W') -- go cycle one more previous window 
+                end
+                count = count + 1
             end
-            
         end
 
         local harpoon = require("harpoon");
         harpoon.ui:toggle_quick_menu(harpoon:list())
+        vim.api.nvim_command('stopinsert') -- stop insert mode - useful when we have come from terminal window, the insert mode is still on
     end
 
     -- default mappings
