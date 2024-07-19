@@ -6,7 +6,7 @@ return {
       { "antosha417/nvim-lsp-file-operations", config = true },
       { "folke/neodev.nvim", opts = {} }, -- used for lua and neovim docs and completion, TODO: neodev is now EOL, replace with lazydev.nvim
       "j-hui/fidget.nvim", 
-    },
+  },
     config = function()
       local shared = require("common.shared")
       -- import lspconfig plugin

@@ -8,6 +8,7 @@ return {
         dependencies = {
             "hrsh7th/cmp-buffer", -- source for text in buffer
             "hrsh7th/cmp-path", -- source for file system paths
+            "hrsh7th/cmp-cmdline", -- source for vim's command line
             {
             "L3MON4D3/LuaSnip", -- snippet engine in lua
             -- follow latest release.
@@ -85,6 +86,24 @@ return {
                   }),
                 },
             })
+            
+            -- for command line completions
+            -- `/` cmdline setup.
+            cmp.setup.cmdline('/', {
+              mapping = cmp.mapping.preset.cmdline(),
+              sources = {
+                { name = 'buffer' }
+              }
+            })
+            -- `:` cmdline setup.
+            cmp.setup.cmdline(':', {
+              mapping = cmp.mapping.preset.cmdline(),
+              sources = {
+                  { name = 'cmdline', option = { ignore_cmds = { 'Man', '!' } } },
+                  { name = 'path' }
+              }
+            })
+
         end
     }
 }
