@@ -49,7 +49,7 @@ vim.keymap.set("n", "<leader>fv", ":NvimTreeToggle<CR>") -- file view
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
 -- Make current file executable
-vim.keymap.set("n", "<leader>fx", "<cmd>!chmod +x %<CR>", {
+vim.keymap.set("n", "<leader>fafx", "<cmd>!chmod +x %<CR>", {
     silent = true
 })
 
@@ -77,6 +77,64 @@ vim.keymap.set('t', '<D-v>', '<C-R>+', { noremap = true, silent = true}) -- Past
 -- vim.keymap.set("n", "<leader><leader>", function()
 --     vim.cmd("so") -- source file - maybe we need to specify the file to source
 -- end)
+
+-- Fold keymaps
+-- Function to move to the previous outer fold above
+local function fold_goto_upper_outer_fold()
+    local current_line = vim.fn.line('.')
+    local current_fold_level = vim.fn.foldlevel(current_line)
+    local current_col = vim.fn.col('.')
+    
+    -- Move up until we find a line with a lower fold level
+    for lnum = current_line - 1, 1, -1 do
+      if vim.fn.foldlevel(lnum) < current_fold_level then
+        vim.fn.cursor(lnum, current_col)
+        return
+      end
+   end
+end
+
+-- Function to move to the next inner fold below
+local function fold_goto_down_inner_fold() 
+    local current_line = vim.fn.line('.')
+    local current_fold_level = vim.fn.foldlevel(current_line)
+    local current_col = vim.fn.col('.')
+    local line_count = vim.fn.line('$')
+    
+    -- Move down until we find a line with a lower fold level
+    for lnum = current_line + 1, line_count, 1 do
+      if vim.fn.foldlevel(lnum) > current_fold_level then
+        vim.fn.cursor(lnum, current_col)
+        return
+      end
+   end
+end
+
+local function fold_goto_fold_same_level(dir)
+    local current_fold_level = vim.fn.foldlevel('.')
+    local current_col = vim.fn.col('.')
+    local line_count 
+    if dir == 1 then
+        line_count = vim.fn.line('$') 
+    elseif dir == -1 then
+        line_count = 1
+    end
+    for lnum = vim.fn.line('.') + dir, line_count, dir do
+      if vim.fn.foldlevel(lnum) == current_fold_level then
+        vim.fn.cursor(lnum, current_col)
+        return
+      end
+    end
+end
+
+vim.keymap.set('n', 'ZO', fold_goto_upper_outer_fold, {noremap = true, silent = true, desc = "Go to outer fold" })
+vim.keymap.set('n', 'ZI', fold_goto_down_inner_fold, {noremap = true, silent = true, desc = "Go to inner fold" })
+vim.keymap.set('n', 'ZJ', function() fold_goto_fold_same_level(1) end, {noremap = true, silent = true, desc = "Go to next fold of same level" })
+vim.keymap.set('n', 'ZK', function() fold_goto_fold_same_level(-1) end, {noremap = true, silent = true, desc = "Go to previous fold of same level" })
+vim.keymap.set('n', 'Za', 'za', {noremap = true, silent = true, desc = "Toggle fold under cursor" })
+vim.keymap.set('n', 'ZA', 'zA', {noremap = true, silent = true, desc = "Toggle all fold under cursor" })
+vim.keymap.set('n', 'ZM', 'zM', {noremap = true, silent = true, desc = "Close all folds" })
+vim.keymap.set('n', 'ZR', 'zR', {noremap = true, silent = true, desc = "Open all folds" })
 
 
 -- Quickfix and Locallist --
