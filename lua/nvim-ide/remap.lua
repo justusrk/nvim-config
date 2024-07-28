@@ -238,10 +238,10 @@ vim.api.nvim_set_keymap('t', '<C-w>l', [[<Cmd>wincmd l<CR>]], {noremap = true , 
 
 -- Copilot Keymaps
 vim.keymap.set('i', '<C-\\>', '<Plug>(copilot-dismiss)')
-vim.keymap.set('i', '<M-\\>', '<Plug>(copilot-suggest)')
+vim.keymap.set('i', '<M-Bslash>', '<Plug>(copilot-suggest)')
 vim.keymap.set('i', '<M-]>', '<Plug>(copilot-next)')
 vim.keymap.set('i', '<M-[>', '<Plug>(copilot-previous)')
-vim.keymap.set('i', '<M-+>', '<Plug>(copilot-accept-word)')
+vim.keymap.set('i', '<M-->', '<Plug>(copilot-accept-word)')
 vim.keymap.set('i', '<M-=>', '<Plug>(copilot-accept-line)')
 
 
