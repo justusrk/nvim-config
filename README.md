@@ -1,6 +1,10 @@
+# Neovim Configuration
 
+I can use this neovim config for neovide and also inside VS Code (in some sad situations).
 
-Installation 
+Neovide is nice because all key bindings work and easier for my eyes to track the cursor.
+
+## Installation 
 
 1. Install ripgrep and sqlite (for Telescope)
 
