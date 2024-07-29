@@ -53,6 +53,16 @@ return {
                 local current_line = vim.api.nvim_get_current_line()
                 vim.api.nvim_win_set_cursor(0, {cursor_pos[1], #current_line})
             end
+            
+            -- Require the utilities module
+            local fsutils = require('utilities.file_system')
+
+            -- Specify the path to the "databases" folder
+            local history_database_folder = "~/.local/share/nvim/databases"
+            local history_database_file = history_database_folder .. "/telescope_history.sqlite3"
+            -- Create the "databases" folder if it does not exist
+            fsutils.create_directory_if_not_exists(history_database_folder)
+            
             local telescope = require('telescope').setup({
                 defaults = {
                     mappings = {
@@ -85,7 +95,7 @@ return {
                         }
                     },
                     history = {
-                        path = '~/.local/share/nvim/databases/telescope_history.sqlite3',
+                        path = history_database_file,
                         limit = 100
                     }
                 }
