@@ -89,6 +89,27 @@ return {
             },
           })
         end,
+        ["tsserver"] = function()
+          lspconfig["tsserver"].setup({
+            capabilities = capabilities,
+            on_attach = function(client, bufnr)
+              -- Example on_attach function
+              -- Additional on_attach settings can be added here if needed
+            end,
+            settings = {
+              implicitProjectConfiguration = { 
+                checkJs = true
+              },
+              typescript = {
+                -- Add any TypeScript-specific settings here
+                -- For example, to enable TypeScript strict mode or specify TypeScript paths
+              },
+              javascript = {
+                -- Add any JavaScript-specific settings here if needed
+              },
+            },
+          })
+        end,
       })
     
 
