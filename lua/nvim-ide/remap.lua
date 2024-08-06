@@ -407,7 +407,7 @@ autocmd('LspAttach', {
         vim.keymap.set("n", "<leader>cws", function() vim.lsp.buf.workspace_symbol() end, opts) -- search for symbols in the workspace
         
         opts.desc = "Opens a floating window with diagnostic information"
-        vim.keymap.set("n", "<leader>cd", function() vim.diagnostic.open_float() end, opts) -- open the diagnostic message floating window
+        vim.keymap.set("n", "<leader>cd", function() vim.diagnostic.open_float(nil, { focusable = true }) end, opts) -- open the diagnostic message floating window
         
 
         opts.desc = "Code action rename symbol under cursor"
