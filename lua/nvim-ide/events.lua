@@ -7,6 +7,3 @@ autocmd({"BufWritePre"}, {
     pattern = "*",
     command = [[%s/\s\+$//e]],
 })
-
--- Disable folding in Telescope's result window.
-autocmd("FileType", { pattern = "TelescopeResults", command = [[setlocal nofoldenable]] })
